@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <script src="{{ url_for('static' , filename='codemirror/lib/codemirror.js') }}"></script>
+        <link rel="stylesheet" href="{{ url_for('static' , filename='codemirror/lib/codemirror.css') }}">
+        <script src="{{ url_for('static' , filename='codemirror/addon/edit/closebrackets.js') }}"></script>
+        <script src="{{ url_for('static' , filename='codemirror/addon/edit/matchbrackets.js') }}"></script>
+        <link rel="stylesheet" href="{{ url_for('static' , filename='codemirror/theme/'+Theme+'.css') }}">
+
+        <script src="{{ url_for('static' , filename='codemirror/mode/clike/clike.js') }}"></script>
+        <script src="{{ url_for('static' , filename='codemirror/mode/python/python.js') }}"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+        
+         <link href="{{ url_for('static' , filename='style.css') }}" rel="stylesheet">
+    <title>CP</title>
+</head>
+<body>
+    <div class = "container-fluid">
+        <form action="/" method="post" id="codeEditor">
+            <div clas="row">
+                <div class ="col-lg-1">
+                    <select name="lang" id="lang"  onchange = "LanguageChanged()">
+                        <option value = {{ SelectedLanguage }} id="language_options" >{{ Languages[SelectedLanguage] }}</option>
+                        {% for lang in Languages %}
+                            {% if lang!=SelectedLanguage %}
+                            <option value= {{ lang }} id="language_options"  >{{ Languages[lang] }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-lg-8">
+                    <label for="code" id="label_code">Write your code here:</label>
+                </div>
+            </div>
+            <div class="row"> 
+                <div class="col-lg-6" id= "CODE">
+                    <textarea id="code" name="code">{{ SourceCode }}</textarea>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <label for="input" id="input_label">Input:</label>
+                </div>
+                
+                <div class="col-lg-6">
+                    <label for="output" id="output_label" style="display:{{ DisplayOutput }}"> Output:</label>
+                </div>
+            </div>
+            <div class="row" >
+                <div class="col-lg-6">
+                    <textarea name="input" id="input">{{ CustomInput }}</textarea>
+                </div>
+                
+                <div class="col-lg-6">
+                    <textarea name="output" id="output" style="display:{{ DisplayOutput }}">
+                        {% if Output!="\nSubmission Results :\n" %}
+                            {{ Output }}
+                        {% else %}
+                            No Output
+                        {% endif %}
+                    </textarea>
+                </div>
+            </div> 
+            <div class="row">
+                <div class="col-lg-1" id="submit_label">
+                    <label for="submit">Submit:</label>
+                </div>
+                <div class="col-lg-1">
+                    <input type ="submit" class="btn btn-success" value="Submit" id="submit_button">
+                </div>
+            </div> 
+        </form>
+    </div>
+    <script>
+             var editor = CodeMirror.fromTextArea(document.getElementById("code"),{
+                mode: "{{ LangHLModes[SelectedLanguage] }}",
+                 theme: "{{Theme}}",
+                 lineNumbers: true,
+                 autoCloseBrackets: true,
+                 matchBrackets:true
+             });
+    </script>
+
+    <script type="text/javascript">
+        function LanguageChanged() {
+            document.getElementById('')
+            document.getElementById('codeEditor').submit();
+        }
+    </script>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script type=text/javascript>
+            $(function() {
+              $('a#submit').bind('click', function() {
+                $.getJSON('/Submit',
+                    function(data) {
+                  //do nothing
+                });
+                return false;
+              });
+            });
+    </script>
+</body>
+</html>

@@ -22,6 +22,7 @@
 <body>
     <div class = "container-fluid">
         <form action="/" method="post" id="codeEditor">
+            <input type="hidden" name="LangChanged" id="LangChanged" value="false">
             <div clas="row">
                 <div class ="col-lg-1">
                     <select name="lang" id="lang"  onchange = "LanguageChanged()">
@@ -38,8 +39,28 @@
                 </div>
             </div>
             <div class="row"> 
-                <div class="col-lg-6" id= "CODE">
-                    <textarea id="code" name="code">{{ SourceCode }}</textarea>
+                <div class="col-lg-6">
+                    <div   id= "CODE">
+                        <textarea id="code" name="code">{{ SourceCode }}</textarea>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div id="problemStatement">
+                    {% if problemQuestion['pValid']=='1' %}
+                        <H1 id="pName">{{problemQuestion['pName']}}</H1>
+                        <p id="pStats">Difficulty : <span id="pStatsData">{{problemQuestion['pDifficulty']}}</span> Accuracy : <span id="pStatsData">{{problemQuestion['pAccuracy']}}</span> Submissions : <span id="pStatsData">{{problemQuestion['pSubmissions']}}</span> </p>
+                        
+                            {% for i in problemQuestion['pDesc'] %}
+                                <p id = "pStatsData">{{i[0]}}</p>
+                                {% for j in range(1,i|length) %}
+                                    <p id="pDesc">{{i[j]}}</p>
+                                {% endfor %}
+                            {%endfor%}
+                        
+                    {% else %}
+                        <H3>Failed to fetch problem </H3> 
+                    {% endif %}
+                </div>
                 </div>
             </div>
             <div class="row">
@@ -57,13 +78,15 @@
                 </div>
                 
                 <div class="col-lg-6">
-                    <textarea name="output" id="output" style="display:{{ DisplayOutput }}">
+                    <div name="output" id="output" style="display:{{ DisplayOutput }}">
                         {% if Output!="\nSubmission Results :\n" %}
-                            {{ Output }}
+                            {% for i in Output %}
+                                {{i}}<br>
+                            {% endfor %}
                         {% else %}
                             No Output
                         {% endif %}
-                    </textarea>
+                    </div>
                 </div>
             </div> 
             <div class="row">
@@ -88,22 +111,10 @@
 
     <script type="text/javascript">
         function LanguageChanged() {
-            document.getElementById('')
+            document.getElementById('LangChanged').value='true';
             document.getElementById('codeEditor').submit();
         }
     </script>
 
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    <script type=text/javascript>
-            $(function() {
-              $('a#submit').bind('click', function() {
-                $.getJSON('/Submit',
-                    function(data) {
-                  //do nothing
-                });
-                return false;
-              });
-            });
-    </script>
-</body>
+    </body>
 </html>

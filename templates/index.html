@@ -18,87 +18,102 @@
         
          <link href="{{ url_for('static' , filename='style.css') }}" rel="stylesheet">
     <title>CP</title>
+    
 </head>
 <body>
     <div class = "container-fluid">
-        <form action="/" method="post" id="codeEditor">
-            <input type="hidden" name="LangChanged" id="LangChanged" value="false">
-            <div clas="row">
-                <div class ="col-lg-1">
-                    <select name="lang" id="lang"  onchange = "LanguageChanged()">
-                        <option value = {{ SelectedLanguage }} id="language_options" >{{ Languages[SelectedLanguage] }}</option>
-                        {% for lang in Languages %}
-                            {% if lang!=SelectedLanguage %}
-                            <option value= {{ lang }} id="language_options"  >{{ Languages[lang] }}</option>
-                            {% endif %}
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-lg-8">
-                    <label for="code" id="label_code">Write your code here:</label>
-                </div>
-            </div>
-            <div class="row"> 
-                <div class="col-lg-6">
-                    <div   id= "CODE">
-                        <textarea id="code" name="code">{{ SourceCode }}</textarea>
+        <form id="codeEditor" action="/" method="post">
+            <input type="hidden" name="Query" id="Query" value="submit">
+
+            <div class="row">
+                <div class="container-fluid col-lg-6" id="leftSide">
+                    <div class ="col-lg-2">
+                        <select name="lang" id="lang"  onchange="LanguageChanged()">
+                            <option value = {{ SelectedLanguage }} id="language_options" >{{ Languages[SelectedLanguage] }}</option>
+                            {% for lang in Languages %}
+                                {% if lang!=SelectedLanguage %}
+                                    <option value= {{ lang }} id="language_options"  >{{ Languages[lang] }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-lg-8">
+                        <label for="code" id="label_code">Write your code here:</label>
+                    </div>
+                    <div class="col-lg-12">
+                        <div   id= "CODE">
+                            <textarea id="code" name="code">{{ SourceCode }}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-12">
+                        <label for="input" id="input_label">Input:</label>
+                    </div>
+
+                    <div class="col-lg-12">
+                        <textarea name="input" id="input">{{ CustomInput }}</textarea>
+                    </div>
+
+                    <div class="col-lg-2" id="submit_label">
+                        <label for="submit">Submit:</label>
+                    </div>
+                    <div class="col-lg-2">
+                        <input type ="submit" class="btn btn-success" value="Submit" id="submit_button" onclick="submit_button()">
                     </div>
                 </div>
-                <div class="col-lg-6">
-                    <div id="problemStatement">
-                    {% if problemQuestion['pValid']=='1' %}
-                        <H1 id="pName">{{problemQuestion['pName']}}</H1>
-                        <p id="pStats">Difficulty : <span id="pStatsData">{{problemQuestion['pDifficulty']}}</span> Accuracy : <span id="pStatsData">{{problemQuestion['pAccuracy']}}</span> Submissions : <span id="pStatsData">{{problemQuestion['pSubmissions']}}</span> </p>
-                        
-                            {% for i in problemQuestion['pDesc'] %}
-                                <p id = "pStatsData">{{i[0]}}</p>
-                                {% for j in range(1,i|length) %}
-                                    <p id="pDesc">{{i[j]}}</p>
+
+                <div class="container-fluid col-lg-6" id="rightSide">
+                    <div class="row" >
+                        <div class="col-lg-8">
+                            <label for="output" id="output_label" style="margin-left:15px; margin-top: 5px;">Output:</label>
+                        </div>
+                        <button class="col-lg-2 btn btn-success" id="showHideOutput" onclick="showHideOutputfn()">
+                            {% if DisplayOutput == 'block' %}
+                                Hide Output
+                            {% else %}   
+                                Show Output
+                            {% endif %}
+                        </button>
+                    </div>
+                    <div class="col-lg-12">
+                        <div name="output" id="output" style="display:{{ DisplayOutput }}">
+                            {% if Output!="\nSubmission Results :\n" %}
+                                {% for i in Output %}
+                                    {{i}}<br>
                                 {% endfor %}
-                            {%endfor%}
-                        
-                    {% else %}
-                        <H3>Failed to fetch problem </H3> 
-                    {% endif %}
-                </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-6">
-                    <label for="input" id="input_label">Input:</label>
-                </div>
-                
-                <div class="col-lg-6">
-                    <label for="output" id="output_label" style="display:{{ DisplayOutput }}"> Output:</label>
-                </div>
-            </div>
-            <div class="row" >
-                <div class="col-lg-6">
-                    <textarea name="input" id="input">{{ CustomInput }}</textarea>
-                </div>
-                
-                <div class="col-lg-6">
-                    <div name="output" id="output" style="display:{{ DisplayOutput }}">
-                        {% if Output!="\nSubmission Results :\n" %}
-                            {% for i in Output %}
-                                {{i}}<br>
-                            {% endfor %}
+                            {% else %}
+                                No Output
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="col-lg-12" id="problemStatementDiv">
+                        <div id="problemStatement">
+                        {% if problemQuestion['pValid']=='1' %}
+                            <H1 id="pName">{{problemQuestion['pName']}}</H1>
+                            <p id="pStats">Difficulty : <span id="pStatsData">{{problemQuestion['pDifficulty']}}</span> Accuracy : <span id="pStatsData">{{problemQuestion['pAccuracy']}}</span> Submissions : <span id="pStatsData">{{problemQuestion['pSubmissions']}}</span> </p>
+                            
+                                {% for i in problemQuestion['pDesc'] %}
+                                    <p id = "pStatsData">{{i[0]}}</p>
+                                    {% for j in range(1,i|length) %}
+                                        <p id="pDesc">{{i[j]}}</p>
+                                    {% endfor %}
+                                {%endfor%}
                         {% else %}
-                            No Output
+                            <H3>Failed to fetch problem </H3> 
                         {% endif %}
                     </div>
-                </div>
-            </div> 
-            <div class="row">
-                <div class="col-lg-1" id="submit_label">
-                    <label for="submit">Submit:</label>
-                </div>
-                <div class="col-lg-1">
-                    <input type ="submit" class="btn btn-success" value="Submit" id="submit_button">
-                </div>
-            </div> 
+                    </div>
+                    
+                </div>   
+            </div>
+            
+
+
+            
         </form>
     </div>
+    
     <script>
              var editor = CodeMirror.fromTextArea(document.getElementById("code"),{
                 mode: "{{ LangHLModes[SelectedLanguage] }}",
@@ -110,8 +125,25 @@
     </script>
 
     <script type="text/javascript">
-        function LanguageChanged() {
-            document.getElementById('LangChanged').value='true';
+        function submit_button()
+        {
+            document.getElementById('Query').value='submit';
+            document.getElementById('codeEditor').submit();
+        }
+
+        function LanguageChanged() 
+        {
+            document.getElementById('Query').value='language_changed';
+            document.getElementById('codeEditor').submit();
+        }
+
+        function showHideOutputfn() 
+        {
+            {% if DisplayOutput=='block' %}
+                document.getElementById('Query').value='hide_output';
+            {% else %}
+                document.getElementById('Query').value='show_output';
+            {% endif %}
             document.getElementById('codeEditor').submit();
         }
     </script>

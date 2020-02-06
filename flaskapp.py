@@ -6,6 +6,7 @@ app = Flask(__name__)
 #Vars
 Theme = 'dracula'
 problemQuestion =''
+problemQuestionName ="rotate-array-by-n-elements/0"
 topics = []
 Languages = {
 	'C' : 'C' ,
@@ -39,7 +40,7 @@ def my_form():
 	global problemQuestion
 	DisplayOutput = 'none'
 	if problemQuestion == '' :
-		problemQuestion = Scraper("rotate-array-by-n-elements/0")
+		problemQuestion = Scraper(problemQuestionName)
 	return render_template('index.html' , Languages = Languages , SelectedLanguage ='C' , DisplayOutput = DisplayOutput , LangHLModes = LangHLModes ,Theme = Theme , problemQuestion = problemQuestion)
 
 @app.route('/', methods=['POST'])
@@ -61,7 +62,7 @@ def my_form_post():
 	elif request.form['Query']=='show_output' :
 		DisplayOutput = 'block'
 	if problemQuestion == '' :
-		problemQuestion = Scraper("rotate-array-by-n-elements/0")
+		problemQuestion = Scraper(problemQuestionName)
 	#print(problemQuestion)
 	return render_template('index.html' , SourceCode=SourceCode , CustomInput=CustomInput, Languages = Languages , SelectedLanguage= Lang , Output = Output , DisplayOutput = DisplayOutput , LangHLModes = LangHLModes , Theme = Theme, problemQuestion=problemQuestion)
 
@@ -111,13 +112,16 @@ def Compile(Code , Lang , Input, Save) :
 				res.append('Compilation Failed!')
 				res.append('Runtime Error :'+Output['rntError'])
 			else :
-				res.append('Accepted!!')
-				res.append(('Output :\n'+Output['output']).strip())
+				res.append("Output : ")
+				temp_op = Output['output'].split('\n')
+				for i in range(len(temp_op)) : 
+					res.append(temp_op[i].strip())
 	else :
 		res.append('\nCompilation Failed!')
 	res.append('\nTime :'+Output['time'] + ' ')
 	res.append('Memory :'+Output['memory']+'	')
 	res.append('Submission Id :'+Output['id'])
+	print("Output \n " , res)
 	return res
 
 def Scraper( ProblemCode ) :
@@ -165,7 +169,7 @@ def Scraper( ProblemCode ) :
 		print("Couldn't connect to Internet! Please check your connection & Try again.")
 	problem = {'pValid' : '0'}
 	return problem
-
+'''
 def ScrapeTopics() :
 	try :
 		response = requests.get('https://practice.geeksforgeeks.org/')
@@ -181,7 +185,7 @@ def ScrapeTopics() :
 	except :
 		print("Please Check your network connection!!")
 		return []
-
+'''
 
 
 #repair scraper function to return    name : link dictionary 

@@ -3,27 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-    <script src="{{ url_for('static' , filename='codemirror/lib/codemirror.js') }}"></script>
-        <link rel="stylesheet" href="{{ url_for('static' , filename='codemirror/lib/codemirror.css') }}">
-        <script src="{{ url_for('static' , filename='codemirror/addon/edit/closebrackets.js') }}"></script>
-        <script src="{{ url_for('static' , filename='codemirror/addon/edit/matchbrackets.js') }}"></script>
-        <link rel="stylesheet" href="{{ url_for('static' , filename='codemirror/theme/'+Theme+'.css') }}">
 
-        <script src="{{ url_for('static' , filename='codemirror/mode/clike/clike.js') }}"></script>
-        <script src="{{ url_for('static' , filename='codemirror/mode/python/python.js') }}"></script>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-        
-         <link href="{{ url_for('static' , filename='style.css') }}" rel="stylesheet">
-    <title>CP</title>
+ <!-- Codemirror CSS/JS files -->
+    <script src="{{ url_for('static' , filename='codemirror/lib/codemirror.js') }}"></script> <!-- Default Codemirror JS file -->
+    <link rel="stylesheet" href="{{ url_for('static' , filename='codemirror/lib/codemirror.css') }}">  <!--Default Codemirror CSS -->
+    <script src="{{ url_for('static' , filename='codemirror/addon/edit/closebrackets.js') }}"></script> <!--Bracket Closing -->
+    <script src="{{ url_for('static' , filename='codemirror/addon/edit/matchbrackets.js') }}"></script>  <!--Bracket Matching -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='codemirror/theme/'+Theme+'.css') }}"> <!-- Theme CSS -->
+    <!--Codemirror Syntax higlighting JS files -->
+    <script src="{{ url_for('static' , filename='codemirror/mode/clike/clike.js') }}"></script>
+    <script src="{{ url_for('static' , filename='codemirror/mode/python/python.js') }}"></script>
+
+<!--Bootstrap CSS/JS CDN -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+<!-- Custom Stylesheet -->
+    <link href="{{ url_for('static' , filename='style.css') }}" rel="stylesheet">
+    
+    <title>Online Judge</title>
     
 </head>
 <body>
     <div class = "container-fluid">
         <form id="codeEditor" action="/" method="post">
-            <input type="hidden" name="Query" id="Query" value="submit">
+            <input type="hidden" name="Query" id="Query" value="submit"> <!--To check Submission Type -->
 
             <div class="row">
                 <div class="container-fluid col-lg-6" id="leftSide">
@@ -79,7 +84,7 @@
                         <div name="output" id="output" style="display:{{ DisplayOutput }}">
                             {% if Output!="\nSubmission Results :\n" %}
                                 {% for i in Output %}
-                                    {{i}}<br>
+                                    <p>{{i}}</p>
                                 {% endfor %}
                             {% else %}
                                 No Output
@@ -89,20 +94,20 @@
 
                     <div class="col-lg-12" id="problemStatementDiv">
                         <div id="problemStatement">
-                        {% if problemQuestion['pValid']=='1' %}
-                            <H1 id="pName">{{problemQuestion['pName']}}</H1>
-                            <p id="pStats">Difficulty : <span id="pStatsData">{{problemQuestion['pDifficulty']}}</span> Accuracy : <span id="pStatsData">{{problemQuestion['pAccuracy']}}</span> Submissions : <span id="pStatsData">{{problemQuestion['pSubmissions']}}</span> </p>
-                            
-                                {% for i in problemQuestion['pDesc'] %}
-                                    <p id = "pStatsData">{{i[0]}}</p>
-                                    {% for j in range(1,i|length) %}
-                                        <p id="pDesc">{{i[j]}}</p>
-                                    {% endfor %}
-                                {%endfor%}
-                        {% else %}
-                            <H3>Failed to fetch problem </H3> 
-                        {% endif %}
-                    </div>
+                            {% if problemQuestion['pValid']=='1' %}
+                                <H1 id="pName">{{problemQuestion['pName']}}</H1>
+                                <p id="pStats">Difficulty : <span id="pStatsData">{{problemQuestion['pDifficulty']}}</span> Accuracy : <span id="pStatsData">{{problemQuestion['pAccuracy']}}</span> Submissions : <span id="pStatsData">{{problemQuestion['pSubmissions']}}</span> </p>
+                                
+                                    {% for i in problemQuestion['pDesc'] %}
+                                        <p id = "pStatsData">{{i[0]}}</p>
+                                        {% for j in range(1,i|length) %}
+                                            <p id="pDesc">{{i[j]}}</p>
+                                        {% endfor %}
+                                    {%endfor%}
+                            {% else %}
+                                <H3>Failed to fetch problem </H3> 
+                            {% endif %}
+                        </div>
                     </div>
                     
                 </div>   
@@ -113,17 +118,18 @@
             
         </form>
     </div>
-    
+<!-- Codemirror Implementation -->
     <script>
              var editor = CodeMirror.fromTextArea(document.getElementById("code"),{
                 mode: "{{ LangHLModes[SelectedLanguage] }}",
                  theme: "{{Theme}}",
                  lineNumbers: true,
                  autoCloseBrackets: true,
-                 matchBrackets:true
+                 matchBrackets:true,
+                 noHScroll:true
              });
     </script>
-
+<!-- Custon JS functions-->
     <script type="text/javascript">
         function submit_button()
         {

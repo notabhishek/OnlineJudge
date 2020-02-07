@@ -33,15 +33,13 @@ LangHLModes = {
 	'Scala' : 'text/x-scala'
 }
 
-
-
 @app.route('/')
 def my_form():
 	global problemQuestion
 	DisplayOutput = 'none'
 	if problemQuestion == '' :
 		problemQuestion = Scraper(problemQuestionName)
-	return render_template('index.html' , Languages = Languages , SelectedLanguage ='C' , DisplayOutput = DisplayOutput , LangHLModes = LangHLModes ,Theme = Theme , problemQuestion = problemQuestion)
+	return render_template('index.html' , Languages = Languages , SelectedLanguage ='Python3' , DisplayOutput = DisplayOutput , LangHLModes = LangHLModes ,Theme = Theme , problemQuestion = problemQuestion)
 
 @app.route('/', methods=['POST'])
 def my_form_post():
@@ -69,24 +67,9 @@ def my_form_post():
 if __name__ == "__main__" : 
 	app.run(debug = True)
 
-'''
-@app.route('/home') 
-def show_topics() :
-	global topics
-	if len(topics) == 0 : 
-		topics = ScrapeTopics()
-	return render_template('topics.html' , topics = topics)
-
-@app.route('/home' , methods=['POST'])
-def show_topics_form() :
-	global topics
-	link = request.form['Query']
-	print(topics[link][0] , topics[link][1])
-	return render_template('home.html')
-'''
 #-------------------------------------------------------------------
 #-------------------------------------------------------------------
-#------------------------FUNCTIONS ---------------------------------------------------------
+#------------------------FUNCTIONS ---------------------------------
 #-------------------------------------------------------------------
 #-------------------------------------------------------------------
 
@@ -113,11 +96,13 @@ def Compile(Code , Lang , Input, Save) :
 				res.append('Runtime Error :'+Output['rntError'])
 			else :
 				res.append("Output : ")
+				print('Unformatted Output : \n ' , Output['output'])
 				temp_op = Output['output'].split('\n')
 				for i in range(len(temp_op)) : 
 					res.append(temp_op[i].strip())
 	else :
 		res.append('\nCompilation Failed!')
+
 	res.append('\nTime :'+Output['time'] + ' ')
 	res.append('Memory :'+Output['memory']+'	')
 	res.append('Submission Id :'+Output['id'])
@@ -129,7 +114,7 @@ def Scraper( ProblemCode ) :
 	URL = BASE_URL + ProblemCode
 	try:
 		response = requests.get(URL)
-		soup = BeautifulSoup(response.content , 'html5lib')
+		soup = BeautifulSoup(response.content ,'html5lib')
 		problem = {}
 		fullPageDiv = soup.find('div' , attrs={'class' : 'row fullPageDiv'})
 		pPage = fullPageDiv.find('div' , attrs={'class' : 'col-sm-7 col-xs-12'})
@@ -146,7 +131,6 @@ def Scraper( ProblemCode ) :
 			if pStats[0][i] <='9' and pStats[0][i]>='0' :
 				temp+=pStats[0][i]
 		pStats[0] = temp
-
 
 		pSubmissions = pStats[0]
 		pAccuracy = pStats[2]
@@ -169,24 +153,4 @@ def Scraper( ProblemCode ) :
 		print("Couldn't connect to Internet! Please check your connection & Try again.")
 	problem = {'pValid' : '0'}
 	return problem
-'''
-def ScrapeTopics() :
-	try :
-		response = requests.get('https://practice.geeksforgeeks.org/')
-		soup = BeautifulSoup(response.content , 'html5lib')
-		Category = soup.find_all('div' , attrs={'class' : 'col-xs-12 col-sm-6 col-md-3 itemInnerDiv'})
-		topics = []
-		for i in Category :
-			if(i.text.strip()=="") :
-				pass
-			else :
-				topics.append([ str(i.text.strip()) ,  str(i.a['href'].strip()) ])
-		return topics	
-	except :
-		print("Please Check your network connection!!")
-		return []
-'''
 
-
-#repair scraper function to return    name : link dictionary 
-#function returns name and corresponding names link is then scraped 

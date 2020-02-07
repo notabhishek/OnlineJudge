@@ -1,6 +1,7 @@
 # OnlineJudge
 Installation :
 Extract static/codemirror.zip inside static/codemirror/
+
 Screenshot 1
 ![Alt text](/Screenshots/1.png?raw=true "Screenshot 1")
 Screenshot 2

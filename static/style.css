@@ -64,6 +64,21 @@ html,body{
 	color : white;
 	font-size: 18px;
 }
+#change_problem_label {
+	color : white;
+	font-size: 18px;
+}
+
+#change_problem {
+	float:left;
+	margin-right: 20px;
+	font-size: 15px;
+	color :#f7f1e3;
+	background-color: #4cd137;
+	border-style: solid;
+    border-width:2px;
+    border-color:#ffd32a;
+}
 #input {
 
 	overflow: auto !important;

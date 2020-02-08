@@ -6,7 +6,10 @@ app = Flask(__name__)
 #Vars
 Theme = 'dracula'
 problemQuestion =''
-problemQuestionName ="rotate-array-by-n-elements/0"
+problemQuestionNames = ["rotate-array-by-n-elements/0" , "sort-and-reverse-vector/1" , "learn-to-comment/1" , "arraylist-operation/1" , "max-distance-between-same-elements/1" , "maximum-in-struct-array/1",
+"addition-of-submatrix/0" , "sum-of-fai-aj-over-all-pairs-in-an-array-of-n-integers/0" , "balanced-array/0" , "counts-zeros-xor-pairs/0" , "play-with-an-array/1" , "ishaan-loves-chocolates/0" , "largest-fibonacci-subsequence/0" , "need-some-change/1"]
+
+problemQuestionName = problemQuestionNames[0]
 topics = []
 Languages = {
 	'C' : 'C' ,
@@ -36,17 +39,27 @@ LangHLModes = {
 @app.route('/')
 def my_form():
 	global problemQuestion
+	global problemQuestionIndex
+	global problemQuestionNames
+	global problemQuestionName
 	DisplayOutput = 'none'
 	if problemQuestion == '' :
+		problemQuestionIndex = 0
+		problemQuestionName = problemQuestionNames[0]
 		problemQuestion = Scraper(problemQuestionName)
-	return render_template('index.html' , Languages = Languages , SelectedLanguage ='Python3' , DisplayOutput = DisplayOutput , LangHLModes = LangHLModes ,Theme = Theme , problemQuestion = problemQuestion)
+	return render_template('index.html' , Languages = Languages , SelectedLanguage ='Python3' , DisplayOutput = DisplayOutput , LangHLModes = LangHLModes ,Theme = Theme , problemQuestion = problemQuestion , problemQuestionNames = problemQuestionNames,selectedProblem = problemQuestionName)
 
 @app.route('/', methods=['POST'])
 def my_form_post():
 	global problemQuestion
+	global problemQuestionIndex
+	global problemQuestionNames
+	global problemQuestionName
 	SourceCode = request.form['code']
 	CustomInput = request.form['input']
 	Lang = request.form['lang']
+	problemQuestionName = request.form['selectedProblem']
+	#problemQuestionName = problemQuestionNames[0]
 	print("Form : " , request.form)
 	Save = 'true'
 	Output = ''
@@ -59,10 +72,14 @@ def my_form_post():
 		DisplayOutput = 'none'
 	elif request.form['Query']=='show_output' :
 		DisplayOutput = 'block'
+	elif request.form['Query']=='change_problem' :
+		problemQuestionName = request.form['selectedProblem']
+		problemQuestion = Scraper(problemQuestionName)
+
 	if problemQuestion == '' :
 		problemQuestion = Scraper(problemQuestionName)
 	#print(problemQuestion)
-	return render_template('index.html' , SourceCode=SourceCode , CustomInput=CustomInput, Languages = Languages , SelectedLanguage= Lang , Output = Output , DisplayOutput = DisplayOutput , LangHLModes = LangHLModes , Theme = Theme, problemQuestion=problemQuestion)
+	return render_template('index.html' , SourceCode=SourceCode , CustomInput=CustomInput, Languages = Languages , SelectedLanguage= Lang , Output = Output , DisplayOutput = DisplayOutput , LangHLModes = LangHLModes , Theme = Theme,problemQuestion = problemQuestion, problemQuestionNames=problemQuestionNames, selectedProblem = problemQuestionName)
 
 if __name__ == "__main__" : 
 	app.run(debug = True)

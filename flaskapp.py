@@ -35,55 +35,6 @@ LangHLModes = {
 	'Python3' : 'text/x-python' , 
 	'Scala' : 'text/x-scala'
 }
-
-@app.route('/')
-def my_form():
-	global problemQuestion
-	global problemQuestionIndex
-	global problemQuestionNames
-	global problemQuestionName
-	DisplayOutput = 'none'
-	if problemQuestion == '' :
-		problemQuestionIndex = 0
-		problemQuestionName = problemQuestionNames[0]
-		problemQuestion = Scraper(problemQuestionName)
-	return render_template('index.html' , Languages = Languages , SelectedLanguage ='Python3' , DisplayOutput = DisplayOutput , LangHLModes = LangHLModes ,Theme = Theme , problemQuestion = problemQuestion , problemQuestionNames = problemQuestionNames,selectedProblem = problemQuestionName)
-
-@app.route('/', methods=['POST'])
-def my_form_post():
-	global problemQuestion
-	global problemQuestionIndex
-	global problemQuestionNames
-	global problemQuestionName
-	SourceCode = request.form['code']
-	CustomInput = request.form['input']
-	Lang = request.form['lang']
-	problemQuestionName = request.form['selectedProblem']
-	#problemQuestionName = problemQuestionNames[0]
-	print("Form : " , request.form)
-	Save = 'true'
-	Output = ''
-	DisplayOutput='none'
-	
-	if request.form['Query']=='submit' :
-		Output = Compile(SourceCode , Lang , CustomInput , Save)
-		DisplayOutput = 'block'
-	elif request.form['Query']=='hide_output' :
-		DisplayOutput = 'none'
-	elif request.form['Query']=='show_output' :
-		DisplayOutput = 'block'
-	elif request.form['Query']=='change_problem' :
-		problemQuestionName = request.form['selectedProblem']
-		problemQuestion = Scraper(problemQuestionName)
-
-	if problemQuestion == '' :
-		problemQuestion = Scraper(problemQuestionName)
-	#print(problemQuestion)
-	return render_template('index.html' , SourceCode=SourceCode , CustomInput=CustomInput, Languages = Languages , SelectedLanguage= Lang , Output = Output , DisplayOutput = DisplayOutput , LangHLModes = LangHLModes , Theme = Theme,problemQuestion = problemQuestion, problemQuestionNames=problemQuestionNames, selectedProblem = problemQuestionName)
-
-if __name__ == "__main__" : 
-	app.run(debug = True)
-
 #-------------------------------------------------------------------
 #-------------------------------------------------------------------
 #------------------------FUNCTIONS ---------------------------------
@@ -91,7 +42,7 @@ if __name__ == "__main__" :
 #-------------------------------------------------------------------
 
 def Compile(Code , Lang , Input, Save) :
-	url = 'https://ide.geeksforgeeks.org/main.php'
+	url = 'https://ide.geeksforgeeks.org/submissionResult.php'
 	data = {
 	'lang' : Lang , 
 	'code' : Code , 
@@ -132,32 +83,36 @@ def Scraper( ProblemCode ) :
 	try:
 		response = requests.get(URL)
 		soup = BeautifulSoup(response.content ,'html5lib')
+		#print(soup)
 		problem = {}
-		fullPageDiv = soup.find('div' , attrs={'class' : 'row fullPageDiv'})
-		pPage = fullPageDiv.find('div' , attrs={'class' : 'col-sm-7 col-xs-12'})
-		
-		pName = pPage.find('div' , attrs={'class' : 'col-lg-12'}).strong.text.strip()
+		fullPageDiv = soup.find('div' , attrs={'class' : 'row problem-container'})
+		# print("full Page Div \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" , fullPageDiv)
+		pPage = fullPageDiv #fullPageDiv.find('div' , attrs={'class' : 'col-sm-7 col-xs-12'})
+		pName = pPage.find('span' , attrs={'class' : 'problem-tab__name'}).text.strip()
+		# print("\n\n\n\n\n\n\n\n\nProblem " , pName)
 		problem['pName'] = pName
 
-		pStats = pPage.find('div' , attrs={'class' : 'col-sm-8 col-xs-12'}).h5.find_all('a')
-		pStats.append(pPage.find('div' , attrs={'class' : 'col-sm-8 col-xs-12'}).h5.find('p'))
+		pStats = pPage.find_all('span' , attrs={'class' : 'problem-tab__value'})
+		
+		# pStats.append(pPage.find('div' , attrs={'class' : 'col-sm-8 col-xs-12'}).h5.find('p'))
 		for i in range(len(pStats)) :
 			pStats[i] = pStats[i].text
+		# print("\n\n\n\n\n", pStats)
 		temp = ''
-		for i in range(len(pStats[0])) :
-			if pStats[0][i] <='9' and pStats[0][i]>='0' :
-				temp+=pStats[0][i]
-		pStats[0] = temp
+		# for i in range(len(pStats[0])) :
+		# 	if (pStats[0][i] <='9' and pStats[0][i]>='0') or (pStats[0][i]=='.') :
+		# 		temp+=pStats[0][i]
+		# pStats[0] = temp
 
-		pSubmissions = pStats[0]
-		pAccuracy = pStats[2]
-		pDifficulty = pStats[1]
+		pSubmissions = pStats[1]
+		pAccuracy = pStats[0]
+		pDifficulty = pStats[2]
 
 		problem['pDifficulty'] = pDifficulty
 		problem['pAccuracy'] = pAccuracy
 		problem['pSubmissions'] = pSubmissions
-
-		tabContent = pPage.find('div' , attrs={'class' : 'problemQuestion'}).find_all('p')
+		print("\n\n\n\n\n\n" , problem)
+		tabContent = pPage.find('div' , attrs={'class' : 'problem-statement'}).find_all('p')
 		pDesc = []
 		for i in range(len(tabContent)) :
 			tabContent[i] = tabContent[i].text
@@ -170,4 +125,56 @@ def Scraper( ProblemCode ) :
 		print("Couldn't connect to Internet! Please check your connection & Try again.")
 	problem = {'pValid' : '0'}
 	return problem
+
+
+@app.route('/')
+def my_form():
+	global problemQuestion
+	global problemQuestionIndex
+	global problemQuestionNames
+	global problemQuestionName
+	DisplayOutput = 'none'
+	if problemQuestion == '' :
+		problemQuestionIndex = 0
+		problemQuestionName = problemQuestionNames[1]
+		problemQuestion = Scraper(problemQuestionName)
+		print(problemQuestion)
+	return render_template('index.html' , Languages = Languages , SelectedLanguage ='Python3' , DisplayOutput = DisplayOutput , LangHLModes = LangHLModes ,Theme = Theme , problemQuestion = problemQuestion , problemQuestionNames = problemQuestionNames,selectedProblem = problemQuestionName)
+
+@app.route('/', methods=['POST'])
+def my_form_post():
+	global problemQuestion
+	global problemQuestionIndex
+	global problemQuestionNames
+	global problemQuestionName
+	SourceCode = request.form['code']
+	CustomInput = request.form['input']
+	Lang = request.form['lang']
+	problemQuestionName = request.form['selectedProblem']
+	#problemQuestionName = problemQuestionNames[0]
+	print("Form : " , request.form)
+	Save = 'true'
+	Output = ''
+	DisplayOutput='none'
+	
+	if request.form['Query']=='submit' :
+		Output = Compile(SourceCode , Lang , CustomInput , Save)
+		DisplayOutput = 'block'
+	elif request.form['Query']=='hide_output' :
+		DisplayOutput = 'none'
+	elif request.form['Query']=='show_output' :
+		DisplayOutput = 'block'
+	elif request.form['Query']=='change_problem' :
+		problemQuestionName = request.form['selectedProblem']
+		problemQuestion = Scraper(problemQuestionName)
+
+	if problemQuestion == '' :
+		problemQuestion = Scraper(problemQuestionName)
+	#print(problemQuestion)
+	return render_template('index.html' , SourceCode=SourceCode , CustomInput=CustomInput, Languages = Languages , SelectedLanguage= Lang , Output = Output , DisplayOutput = DisplayOutput , LangHLModes = LangHLModes , Theme = Theme,problemQuestion = problemQuestion, problemQuestionNames=problemQuestionNames, selectedProblem = problemQuestionName)
+
+if __name__ == "__main__" : 
+	app.run(debug = True)
+
+
 

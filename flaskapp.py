@@ -1,7 +1,7 @@
 from flask import Flask, request, render_template
 import requests
 from bs4 import BeautifulSoup
-
+import time
 app = Flask(__name__)
 #Vars
 Theme = 'dracula'
@@ -42,30 +42,47 @@ LangHLModes = {
 #-------------------------------------------------------------------
 
 def Compile(Code , Lang , Input, Save) :
-	url = 'https://ide.geeksforgeeks.org/submissionResult.php'
+	url = 'https://ide.geeksforgeeks.org/main.php'
+	urlSub = 'https://ide.geeksforgeeks.org/submissionResult.php'
 	data = {
 	'lang' : Lang , 
 	'code' : Code , 
 	'input' : Input , 
 	'save' : Save
 	}
-	response = requests.post(url,data=data)
+	response1 = requests.post(url,data=data).json()
+	print("Resrponse "  , response1)
+	while(response1['status']!='SUCCESS') :
+		response1 = requests.post(url,data=data).json()
+	SID = response1['sid']
+	# time.sleep(1)
+
+	response = requests.post(urlSub , data= {'sid' : SID , 'requestType' : 'fetchResults'})
 	Output = response.json()
+	while Output['status'] != 'SUCCESS' : 
+		response = requests.post(urlSub , data= {'sid' : SID , 'requestType' : 'fetchResults'})
+		Output = response.json()
+	# while(Output['status'] != 'SUCCESS') :
+    # 	response = requests.post(urlSub , data= {'sid' : SID , 'requestType' : 'fetchResults'})
+	# 	Output = response.json()
+	print(Output)
 	res = []
 	if Output['compResult']=='S' and Output['valid']=='1' :
-		if Output['cmpError']!='' :
+		if ('cmpError' in Output) and Output['cmpError']!='' :
 			res.append('Compilation Failed!')
 			res.append('Compilation Error :'+Output['cmpError'])
-			if Output['rntError']!='':
+			if  ('rntError' in Output ) and Output['rntError']!='':
 				res.append('Runtime Error :'+Output['rntError'])
 		else:
-			if Output['rntError']!='':
+			if ('rntError' in Output ) and Output['rntError']!='':
 				res.append('Compilation Failed!')
 				res.append('Runtime Error :'+Output['rntError'])
-			else :
+			else:
 				res.append("Output : ")
-				print('Unformatted Output : \n ' , Output['output'])
-				temp_op = Output['output'].split('\n')
+				# print('Unformatted Output : \n ' , Output['output'])
+				temp_op = ''
+				if 'output' in Output:
+    					temp_op = Output['output'].split('\n')			
 				for i in range(len(temp_op)) : 
 					res.append(temp_op[i].strip())
 	else :
@@ -175,6 +192,7 @@ def my_form_post():
 
 if __name__ == "__main__" : 
 	app.run(debug = True)
+
 
 
 

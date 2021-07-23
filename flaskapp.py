@@ -99,10 +99,10 @@ def Scraper( ProblemCode ) :
 	URL = BASE_URL + ProblemCode
 	try:
 		response = requests.get(URL)
-		soup = BeautifulSoup(response.content ,'html5lib')
-		#print(soup)
+		soup = BeautifulSoup(response.content ,'lxml')
+		# print(soup)
 		problem = {}
-		fullPageDiv = soup.find('div' , attrs={'class' : 'row problem-container'})
+		fullPageDiv = soup.find('div' , attrs={'id' : 'problems'})
 		# print("full Page Div \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" , fullPageDiv)
 		pPage = fullPageDiv #fullPageDiv.find('div' , attrs={'class' : 'col-sm-7 col-xs-12'})
 		pName = pPage.find('span' , attrs={'class' : 'problem-tab__name'}).text.strip()

@@ -1,4 +1,4 @@
-# OnlineJudge
+# OnlineJudge [Live Application](https://online-judge-cp.herokuapp.com/)
 
 ## Installation :
 Extract "static/codemirror.rar" inside "static/codemirror/"
